@@ -1,0 +1,6 @@
+query GetAppByPublicKey($publicKey: String!) {
+    getAppByPublicKey(publicKey: $publicKey) {
+        appName
+        gandalfID
+    }
+}
