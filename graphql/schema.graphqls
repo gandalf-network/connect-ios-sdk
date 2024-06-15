@@ -1,0 +1,526 @@
+"""
+The @defer directive may be specified on a fragment spread to imply de-prioritization, that causes the fragment to be omitted in the initial response, and delivered as a subsequent response afterward. A query with @defer directive will cause the request to potentially return multiple responses, where non-deferred data is delivered in the initial response and data deferred delivered in a subsequent response. @include and @skip take precedence over @defer.
+"""
+directive @defer(if: Boolean = true, label: String) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"""Directive to skip authentication check for a specific field."""
+directive @skipAuth on FIELD_DEFINITION
+
+"""
+A directive used by the Apollo iOS client to annotate operations or fragments that should be used exclusively for generating local cache mutations instead of as standard operations.
+"""
+directive @apollo_client_ios_localCacheMutation on QUERY | MUTATION | SUBSCRIPTION | FRAGMENT_DEFINITION
+
+"""
+A directive used by the Apollo iOS code generation engine to generate custom import statements in operation or fragment definition files. An import statement to import a module with the name provided in the `module` argument will be added to the generated definition file.
+"""
+directive @import(
+  """The name of the module to import."""
+  module: String!
+) repeatable on QUERY | MUTATION | SUBSCRIPTION | FRAGMENT_DEFINITION
+
+type Activity {
+  """Unique identifier for the activity."""
+  id: String!
+
+  """Metadata associated with the activity."""
+  metadata: ActivityMetadata!
+}
+
+interface ActivityMetadata {
+  """List of identifiers associated with the activity's subject."""
+  subject: [Identifier]
+}
+
+type ActivityResponse {
+  data: [Activity]!
+
+  """The maximum number of activities to retrieve (limit: 300)."""
+  limit: Int64!
+
+  """The total number of available activities in the dataset."""
+  total: Int64!
+
+  """The page number from which activities are being pulled."""
+  page: Int64!
+}
+
+enum ActivityType {
+  TRIP
+  STAY
+  SHOP
+  PLAY
+  WATCH
+}
+
+type AmazonActivityMetadata implements ActivityMetadata {
+  """The product name of the Amazon activity"""
+  productName: String!
+
+  """List of identifiers associated with the activity's subject."""
+  subject: [Identifier]
+
+  """Date indicating when the activity occurred."""
+  date: Date
+
+  """Quantity of item purchased"""
+  quantityPurchased: Int!
+
+  """Total cost of purchased product"""
+  totalCost: String!
+}
+
+"""
+Represents a registered application within the system, encapsulating all relevant details
+that identify and describe the application.
+"""
+type Application {
+  """The human-readable name of the application."""
+  appName: String!
+
+  """
+  A public key associated with the application, used for cryptographic operations such as
+  verifying the identity of the application.
+  """
+  publicKey: String!
+
+  """
+  The URL pointing to the icon graphic for the application. This URL should link to an image
+  that visually represents the application, aiding in its identification and branding.
+  """
+  iconURL: String!
+
+  """A unique identifier assigned to the application upon registration."""
+  gandalfID: Int64!
+
+  """The address of the user who registered the application. """
+  appRegistrar: String!
+}
+
+type BookingActivityMetadata implements ActivityMetadata {
+  """List of identifiers associated with the activity's subject."""
+  subject: [Identifier]
+
+  """Reference identifying a booking"""
+  bookingID: String!
+
+  """The ticket or bill of a trip or stay"""
+  price: String!
+
+  """An array of bookings in a single purchase"""
+  bookings: [BookingItem!]!
+}
+
+type BookingItem {
+  """CheckIn time of a booking"""
+  startDateTime: Time!
+
+  """CheckOut time of a booking"""
+  endDateTime: Time!
+
+  """The location of a trip"""
+  address: String!
+
+  """The location where a booking flight takes off from"""
+  depatureLocation: String!
+
+  """The location of arrival of a booking flight"""
+  arrivalLocation: String!
+
+  """
+  An string listing the stops of a flight between its depature and arrival locations
+  """
+  layoverLocations: [String]!
+
+  """Activity type of the returned data source"""
+  activityType: ActivityType!
+}
+
+enum ContentType {
+  VIDEO
+  SHORTS
+  MUSIC
+}
+
+scalar Date
+
+type Identifier {
+  """The string value of the identifier."""
+  value: String!
+
+  """The type of the identifier (enumeration)"""
+  identifierType: IdentifierType!
+}
+
+enum IdentifierType {
+  IMDB
+  MOBY
+  RAWG
+  IGDB
+  ASIN
+  PLAYSTATION
+  YOUTUBE
+  TVDB
+  TVMAZE
+  UBER
+  BOOKING
+  INSTACART
+  UBEREATS
+}
+
+type InstacartActivityMetadata implements ActivityMetadata {
+  """List of identifiers associated with the activity's subject."""
+  subject: [Identifier]
+
+  """The name of the ratailer that handled the order."""
+  retailer: String!
+
+  """The total amount spent on this order."""
+  totalOrderAmountSpent: String!
+
+  """The date the order was placed"""
+  dateOrdered: Date!
+
+  """The date the order was delivered"""
+  dateDelivered: Date!
+
+  """String indicating the status of the order"""
+  statusString: String!
+
+  """List of items ordered."""
+  items: [InstacartOrderItem!]!
+}
+
+enum InstacartItemStatus {
+  FOUND
+  REPLACED
+  TOREFUND
+}
+
+type InstacartOrderItem {
+  """The Instacart ID of the item"""
+  itemID: String!
+
+  """The name of the ordered item."""
+  productName: String!
+
+  """The price per unit e.g (1.39 • 1 gal)."""
+  unitPrice: String!
+
+  """Enum indicating the status of the ordered item e.g found"""
+  status: InstacartItemStatus!
+
+  """The quantity purchased."""
+  quantityPurchased: Int64!
+}
+
+enum InstacartOrderStatus {
+  COMPLETE
+}
+
+"""Scalar type representing a 64-bit signed integer."""
+scalar Int64
+
+scalar JSON
+
+"""Scalar type representing a map data structure."""
+scalar Map
+
+type NetflixActivityMetadata implements ActivityMetadata {
+  """The title of the Netflix activity"""
+  title: String!
+
+  """List of identifiers associated with the activity's subject."""
+  subject: [Identifier]
+
+  """
+  Date indicating when the activity occurred , formatted as (DD/MM/YYYY).
+  """
+  date: Date @deprecated(reason: "use lastPlayedAt")
+
+  """
+  Date indicating when the activity was last played , formatted as (DD/MM/YYYY).
+  """
+  lastPlayedAt: Date
+}
+
+type PlaystationActivityMetadata implements ActivityMetadata {
+  """The title of the Playstation activity"""
+  title: String!
+
+  """List of identifiers associated with the activity's subject."""
+  subject: [Identifier]
+
+  """Date indicating the last time game was played."""
+  lastPlayedAt: Date
+}
+
+type Query {
+  """
+  Retrieves a paginated list of activities based on a given data key and source.
+  
+  Returns: A response object containing a list of activities, along with pagination information.
+  """
+  getActivity(
+    """
+    A unique key that is generated after a user has completed the data submission flow.
+    """
+    dataKey: String!
+
+    """
+    An array specifying the activity type of the data source that should be returned. e.g trip, stay, shop etc
+    """
+    activityType: [ActivityType]
+
+    """The source from which to fetch activities, such as NETFLIX or AMAZON."""
+    source: Source!
+
+    """The maximum number of activities to return in a single response."""
+    limit: Int64!
+
+    """
+    The page number of the activity list to retrieve, allowing for pagination through large sets of data.
+    """
+    page: Int64!
+  ): ActivityResponse!
+
+  """
+  Looks up a specific activity by its unique identifier (ID) and a data key.
+  
+  Returns: An Activity object containing detailed information about the requested activity.
+  """
+  lookupActivity(
+    """
+    A unique key that is generated after a user has completed the data submission flow. 
+    """
+    dataKey: String!
+
+    """The unique identifier (UUID) of the activity to retrieve."""
+    activityId: UUID!
+  ): Activity!
+
+  """
+  Retrieves an application by its public key.
+  
+  Returns: An Application object that includes detailed information about the requested application.
+  """
+  getAppByPublicKey(
+    """The public key associated with the desired application."""
+    publicKey: String!
+  ): Application!
+
+  """
+  get user traits for a specific source by datakey
+  
+  Returns: A response object containing a list of traits.
+  """
+  getTraits(
+    """
+    A unique key that is generated after a user has completed the data submission flow. 
+    """
+    dataKey: String!
+
+    """
+    A unique key that is generated after a user has completed the data submission flow.
+    """
+    source: Source!
+
+    """A list of trait label"""
+    labels: [TraitLabel]!
+  ): [Trait]!
+
+  """
+  Looks up a specific trait by its unique identifier (ID) and a data key.
+  
+  Returns: A trait object containing detailed information about the requested trait.
+  """
+  lookupTrait(
+    """
+    A unique key that is generated after a user has completed the data submission flow. 
+    """
+    dataKey: String!
+
+    """The unique identifier (UUID) of the trait to retrieve."""
+    traitId: UUID!
+  ): Trait!
+}
+
+enum Source {
+  NETFLIX
+  PLAYSTATION
+  YOUTUBE
+  AMAZON
+  UBER
+  BOOKING
+  INSTACART
+  INSTAGRAM
+  X
+  UBEREATS
+  GANDALF
+}
+
+"""Scalar type representing a specific point in time."""
+scalar Time
+
+"""Represents a User Trait."""
+type Trait {
+  """Unique identifier for the activity."""
+  id: UUID!
+
+  """The source of the trait."""
+  source: Source!
+
+  """The label of the trait."""
+  label: TraitLabel!
+
+  """The value of the trait."""
+  value: String!
+
+  """The timestamp when the trait was recorded."""
+  timestamp: Time!
+}
+
+"""Represents the labels for different user traits."""
+enum TraitLabel {
+  """Indicates if the user is a prime subscriber."""
+  PRIME_SUBSCRIBER
+
+  """User rating."""
+  RATING
+
+  """Number of trips taken by the user."""
+  TRIP_COUNT
+
+  """Date when the user account was created."""
+  ACCOUNT_CREATED_ON
+
+  """User plan."""
+  PLAN
+
+  """User's genius level."""
+  GENIUS_LEVEL
+
+  """The number of account following the user."""
+  FOLLOWER_COUNT
+
+  """The number of accounts followed by the user."""
+  FOLLOWING_COUNT
+
+  """The users profile name."""
+  USERNAME
+
+  """The number of posts the user has made on the platform."""
+  POST_COUNT
+
+  """The users email."""
+  EMAIL
+
+  """The number of orders the user has made on the platform."""
+  ORDER_COUNT
+}
+
+enum TripStatus {
+  CANCELED
+  COMPLETED
+  UNFULFILLED
+}
+
+scalar UUID
+
+type UberActivityMetadata implements ActivityMetadata {
+  """List of identifiers associated with the activity's subject."""
+  subject: [Identifier]
+
+  """This indicates the start time of the trip"""
+  beginTripTime: Time!
+
+  """This indicates the end time of the trip"""
+  dropoffTime: Time
+
+  """A string indicating the cost of the trip"""
+  cost: String!
+
+  """A string indicating the city the trip originated from"""
+  city: String!
+
+  """Distance covered from pickup to dropoff location"""
+  distance: String!
+
+  """Enum indicating the status of a trip"""
+  status: TripStatus!
+}
+
+type UberEatsActivityMetadata implements ActivityMetadata {
+  """List of identifiers associated with the activity's subject."""
+  subject: [Identifier]
+
+  """Date indicating when the order was made."""
+  date: Date
+
+  """The name of the restaurant that handled the order."""
+  restaurant: String!
+
+  """The currency the order was priced in."""
+  currency: String!
+
+  """The total amount spent on this order."""
+  totalPrice: Float!
+
+  """Enum indicating the status of the order"""
+  status: UberEatsOrderStatus!
+
+  """List of items ordered."""
+  items: [UberEatsOrderItem!]!
+}
+
+type UberEatsOrderItem {
+  """The name of the ordered item."""
+  name: String!
+
+  """The price per unit."""
+  price: String!
+
+  """The quantity purchased."""
+  quantityPurchased: Int64!
+
+  """Order customizations."""
+  customizations: [UberEatsOrderItemCustomizations]!
+}
+
+type UberEatsOrderItemCustomizations {
+  """The customization tag."""
+  customization: String!
+
+  """The customization chosen."""
+  value: String!
+
+  """The customization quantity requested."""
+  quantity: Int64!
+}
+
+enum UberEatsOrderStatus {
+  SUCCESS
+  EATER_CANCELLED
+  RESTAURANT_CANCELLED
+  RESTAURANT_UNFULFILLED
+  UNKNOWN
+}
+
+type YoutubeActivityMetadata implements ActivityMetadata {
+  """The title of the Youtube activity"""
+  title: String!
+
+  """List of identifiers associated with the activity's subject."""
+  subject: [Identifier]
+
+  """Date indicating the last time the Youtube video was played."""
+  date: Date
+
+  """
+  An integer indicating what percentage of the entire video duration watched.
+  """
+  percentageWatched: Int!
+
+  """Enum denoting the type of the youtube activity"""
+  contentType: ContentType!
+}

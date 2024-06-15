@@ -1,0 +1,36 @@
+{
+    "schemaNamespace": "GandalfConnectAPI",
+    "input": {
+        "operationSearchPaths": ["**/*.graphql"],
+        "schemaSearchPaths": ["**/*.graphqls"]
+    },
+    "output": {
+        "testMocks": {
+            "none": {}
+        },
+        "schemaTypes": {
+            "path": "./GandalfConnectAPI",
+            "moduleType": {
+                "swiftPackageManager": {}
+            }
+        },
+        "operations": {
+            "inSchemaModule": {}
+        }
+    },
+    "schemaDownloadConfiguration": {
+        "downloadMethod": {
+            "introspection": {
+                "endpointURL": "https://sauron.gandalf.network/public/gql",
+                "httpMethod": {
+                    "POST": {}
+                },
+                "includeDeprecatedInputValues": false,
+                "outputFormat": "SDL"
+            }
+        },
+        "downloadTimeout": 60,
+        "headers": [],
+        "outputPath": "./graphql/schema.graphqls"
+    }
+}

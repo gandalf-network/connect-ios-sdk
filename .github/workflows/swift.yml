@@ -1,0 +1,35 @@
+name: Swift
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.1.2
+
+    - name: Set up Swift
+      uses: swift-actions/setup-swift@v2
+      with:
+        swift-version: '5.9'
+
+    - name: Install dependencies
+      run: swift package resolve
+
+    - name: Build
+      run: swift build --disable-sandbox
+
+    - name: Run tests
+      run: swift test --disable-sandbox

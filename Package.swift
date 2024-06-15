@@ -4,20 +4,36 @@
 import PackageDescription
 
 let package = Package(
-    name: "GandalfConnectIOS",
+    name: "GandalfConnect",
+    platforms: [.iOS(.v15), .macOS(.v11)],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "GandalfConnectIOS",
-            targets: ["GandalfConnectIOS"]),
+            name: "GandalfConnect",
+            targets: ["GandalfConnect"]),
+        .executable(
+            name: "Example",
+            targets: ["Example"])
+    ],
+    dependencies: [
+        .package(url: "https://github.com/apollographql/apollo-ios.git", .upToNextMajor(from: "1.12.2")),
+        .package(path: "./GandalfConnectAPI"),
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "GandalfConnectIOS"),
+            name: "GandalfConnect",
+            dependencies: [
+              .product(name: "GandalfConnectAPI", package: "GandalfConnectAPI"),
+              .product(name: "Apollo", package: "apollo-ios"),
+            ],
+            path: "./Sources/GandalfConnect"
+        ),
+        .executableTarget(
+            name: "Example",
+            dependencies: ["GandalfConnect"],
+            path: "./Sources/Example"
+        ),
         .testTarget(
-            name: "GandalfConnectIOSTests",
-            dependencies: ["GandalfConnectIOS"]),
+            name: "GandalfConnectTests",
+            dependencies: ["GandalfConnect"]),
     ]
 )

@@ -1,0 +1,20 @@
+query GetSupportedServices {
+  __sourceType: __type(name: "Source") {
+    name
+    enumValues(includeDeprecated: false) {
+      name
+    }
+  }
+  __traitType: __type(name: "TraitLabel") {
+    name
+    enumValues(includeDeprecated: false) {
+      name
+    }
+  }
+  __activityType: __type(name: "ActivityType") {
+    name
+    enumValues(includeDeprecated: false) {
+      name
+    }
+  }
+}
