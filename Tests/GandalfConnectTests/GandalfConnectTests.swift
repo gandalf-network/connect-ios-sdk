@@ -1,5 +1,5 @@
 import XCTest
-@testable import GandalfConnectIOS
+@testable import GandalfConnect
 
 final class ConnectTests: XCTestCase {
 

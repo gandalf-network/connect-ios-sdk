@@ -5,8 +5,10 @@ import PackageDescription
 let package = Package(
   name: "GandalfConnectAPI",
   platforms: [
-    .iOS(.v15),
+    .iOS(.v12),
     .macOS(.v10_14),
+    .tvOS(.v12),
+    .watchOS(.v5),
   ],
   products: [
     .library(name: "GandalfConnectAPI", targets: ["GandalfConnectAPI"]),

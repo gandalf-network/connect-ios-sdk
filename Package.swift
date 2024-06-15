@@ -4,12 +4,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "GandalfConnectIOS",
+    name: "GandalfConnect",
     platforms: [.iOS(.v15), .macOS(.v11)],
     products: [
         .library(
-            name: "GandalfConnectIOS",
-            targets: ["GandalfConnectIOS"]),
+            name: "GandalfConnect",
+            targets: ["GandalfConnect"]),
         .executable(
             name: "Example",
             targets: ["Example"])
@@ -20,20 +20,20 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "GandalfConnectIOS",
+            name: "GandalfConnect",
             dependencies: [
               .product(name: "GandalfConnectAPI", package: "GandalfConnectAPI"),
               .product(name: "Apollo", package: "apollo-ios"),
             ],
-            path: "./Sources/GandalfConnectIOS"
+            path: "./Sources/GandalfConnect"
         ),
         .executableTarget(
             name: "Example",
-            dependencies: ["GandalfConnectIOS"],
+            dependencies: ["GandalfConnect"],
             path: "./Sources/Example"
         ),
         .testTarget(
-            name: "GandalfConnectIOSTests",
-            dependencies: ["GandalfConnectIOS"]),
+            name: "GandalfConnectTests",
+            dependencies: ["GandalfConnect"]),
     ]
 )

@@ -25,11 +25,11 @@ This section provides a quick overview of how to integrate the library into your
 2. Go to `File` > `Add Packages...`.
 3. Enter the repository URL: `https://github.com/gandalf-network/connect-ios-sdk.git`.
 4. Choose the version rule (e.g., "Up to Next Major") and click `Add Package`.
-5. Select the GandalfConnectIOS package for your target.
+5. Select the GandalfConnect package for your target.
 
 ### Using Package.swift
 
-To integrate GandalfConnectIOS into your project, add it to your `Package.swift` file:
+To integrate GandalfConnect into your project, add it to your `Package.swift` file:
 
 ```swift
 // swift-tools-version: 5.9
@@ -43,7 +43,7 @@ let package = Package(
     targets: [
         .target(
             name: "YourTargetName",
-            dependencies: ["GandalfConnectIOS"]
+            dependencies: ["GandalfConnect"]
         )
     ]
 )
@@ -55,10 +55,10 @@ Then, run `swift package update` to fetch the dependency.
 
 ### Importing the Library
 
-In your Swift file where you want to use GandalfConnectIOS, import the library:
+In your Swift file where you want to use GandalfConnect, import the library:
 
 ```swift
-import GandalfConnectIOS
+import GandalfConnect
 ```
 
 ### Initialization

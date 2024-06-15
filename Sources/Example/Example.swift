@@ -1,5 +1,5 @@
 import Foundation
-import GandalfConnectIOS
+import GandalfConnect
 
 @main
 struct Example {
