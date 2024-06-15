@@ -4,17 +4,19 @@ import XCTest
 final class ConnectTests: XCTestCase {
 
     // Constants for test values
-    let publicKey = "abc"
+    let publicKey = "0x02073d3b9daf439c19a267dcfc19bc1ac1aea5066d8c754554b046476099b6fa22"
     let invalidPublicKey = "invalidPublicKey"
     let redirectURL = "https://example.com"
     let invalidRedirectURL = "invalid-url"
-    let services: [String: Any] = ["uber": ["traits": ["rating"], "activities": ["trip"]]]
-    let invalidServices: [String: Any] = ["facebook": ["traits": ["plan"], "activities": ["watch"]]]
-    let noRequiredServices: [String: Any] = ["netflix": ["traits": [], "activities": []]]
-    let multipleServices: [String: Any] = [
-        "uber": ["traits": ["rating"], "activities": ["trip"]],
-        "netflix": ["traits": ["plan"], "activities": ["watch"]],
-        "instacart": ["activities": ["shop"]]
+    
+    // Define services in terms of InputData
+    let services: InputData = ["uber": .service(Service(traits: ["rating"], activities: ["trip"]))]
+    let invalidServices: InputData = ["facebook": .service(Service(traits: ["plan"], activities: ["watch"]))]
+    let noRequiredServices: InputData = ["netflix": .service(Service(traits: [], activities: []))]
+    let multipleServices: InputData = [
+        "uber": .service(Service(traits: ["rating"], activities: ["trip"])),
+        "netflix": .service(Service(traits: ["plan"], activities: ["watch"])),
+        "instacart": .service(Service(traits: [], activities: ["shop"]))
     ]
 
     func testInitialization() {
@@ -23,7 +25,12 @@ final class ConnectTests: XCTestCase {
         
         XCTAssertEqual(connect.publicKey, publicKey)
         XCTAssertEqual(connect.redirectURL, "https://example.com")
-        XCTAssertEqual(connect.data["uber"] as? [String: [String]], services["uber"] as? [String: [String]])
+        if case .service(let service) = connect.data["uber"], let expectedService = services["uber"], case .service(let expectedServiceData) = expectedService {
+            XCTAssertEqual(service.traits, expectedServiceData.traits)
+            XCTAssertEqual(service.activities, expectedServiceData.activities)
+        } else {
+            XCTFail("Service data does not match expected values.")
+        }
     }
 
     func testGenerateURL() async throws {
@@ -43,6 +50,7 @@ final class ConnectTests: XCTestCase {
             _ = try await connect.generateURL()
             XCTFail("Expected to throw, but did not throw")
         } catch let error as GandalfError {
+            print("err: \(error)")
             XCTAssertEqual(error.code, .InvalidPublicKey)
         } catch {
             XCTFail("Unexpected error type: \(type(of: error))")

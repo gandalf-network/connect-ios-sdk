@@ -136,7 +136,11 @@ public class Connect {
                         continuation.resume()
                     }
                 case .failure(let error):
-                    continuation.resume(throwing: error)
+                    if let gandalfError = error as? GandalfError {
+                        continuation.resume(throwing: gandalfError)
+                    } else {
+                        continuation.resume(throwing: GandalfError(message: error.localizedDescription, code: .InvalidPublicKey))
+                    }
                 }
             }
         }
