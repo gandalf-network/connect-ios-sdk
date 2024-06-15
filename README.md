@@ -1,6 +1,6 @@
 # connect-ios-sdk
 
-`connect` is a Swift library that makes it easier to generate valid [Connect](https://docs.gandalf.network/concepts/connect) URLs that lets your users to link their accounts to Gandalf.
+`connect-ios-sdk` is a Swift library that makes it easier to generate valid [Connect](https://docs.gandalf.network/concepts/connect) URLs that lets your users to link their accounts to Gandalf.
 
 ## Features
 
@@ -145,4 +145,8 @@ do {
 
 ## Contributing
 
-Contributions are welcome, whether they're feature requests, bug fixes, or documentation improvements.
+We would love you to contribute to `connect-ios-sdk`, pull requests are welcome! Please see the [CONTRIBUTING.md](CONTRIBUTING.md) for more information.
+
+## License
+
+The scripts and documentation in this project are released under the [MIT License](LICENSE.md)
