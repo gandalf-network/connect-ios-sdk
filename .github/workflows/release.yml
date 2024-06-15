@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  tag_and_release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Get current version
+      id: get_version
+      run: |
+        # Get the latest tag and extract the version
+        latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+        echo "Latest tag: $latest_tag"
+        if [ -z "$latest_tag" ]; then
+          latest_tag="1.0.0"
+        fi
+        echo "latest_tag=$latest_tag" >> $GITHUB_ENV
+
+        # Split version into components
+        IFS='.' read -r -a version_parts <<< "$latest_tag"
+        major_version=${version_parts[0]}
+        minor_version=${version_parts[1]}
+        patch_version=${version_parts[2]}
+        
+        # Increment the patch version
+        new_patch_version=$((patch_version + 1))
+        new_version="$major_version.$minor_version.$new_patch_version"
+        echo "New version: $new_version"
+        echo "new_version=$new_version" >> $GITHUB_ENV
+
+    - name: Bump version and push tag
+      run: |
+        # Set git user details
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+        # Tag the new version
+        git tag ${{ env.new_version }}
+        git push origin ${{ env.new_version }}
+
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.new_version }}
+        release_name: Release ${{ env.new_version }}
+        body: |
+          Changelog:
+          - Pilot release 🚀🚀 Check Readme for more details.
+        draft: false
+        prerelease: false
