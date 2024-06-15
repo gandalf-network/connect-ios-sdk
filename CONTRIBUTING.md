@@ -5,14 +5,14 @@ We appreciate your interest in contributing to connect-ios-sdk! By contributing,
 ## How to Contribute
 
 1. **Fork the repository**:
-   - Navigate to the [connect-ios-sdk repository](https://github.com/gandalf-network/connect-ios).
+   - Navigate to the [connect-ios-sdk repository](https://github.com/gandalf-network/connect-ios-sdk).
    - Click the "Fork" button at the top-right corner to create your copy of the repository.
 
 2. **Clone your fork**:
    - Clone your forked repository to your local machine using the following command:
 
      ```sh
-     git clone https://github.com/gandalf-network/connect-ios.git
+     git clone https://github.com/gandalf-network/connect-ios-sdk.git
      ```
 
    - Navigate to the cloned directory:
@@ -56,7 +56,7 @@ We appreciate your interest in contributing to connect-ios-sdk! By contributing,
      ```
 
 8. **Open a Pull Request**:
-   - Go to the [original repository](https://github.com/gandalf-network/connect-ios) and click the "New Pull Request" button.
+   - Go to the [original repository](https://github.com/gandalf-network/connect-ios-sdk) and click the "New Pull Request" button.
    - Select the branch you just pushed from your fork and compare it with the base repository.
    - Provide a detailed description of your changes and submit the pull request.
 
@@ -69,7 +69,7 @@ We appreciate your interest in contributing to connect-ios-sdk! By contributing,
 
 ## Reporting Issues
 
-If you encounter any issues with the project, please report them using the [issue tracker](https://github.com/gandalf-network/connect-ios/issues). Provide as much detail as possible to help us understand and resolve the issue.
+If you encounter any issues with the project, please report them using the [issue tracker](https://github.com/gandalf-network/connect-ios-sdk/issues). Provide as much detail as possible to help us understand and resolve the issue.
 
 ## Thank You
 
