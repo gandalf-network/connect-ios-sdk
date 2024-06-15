@@ -50,7 +50,6 @@ final class ConnectTests: XCTestCase {
             _ = try await connect.generateURL()
             XCTFail("Expected to throw, but did not throw")
         } catch let error as GandalfError {
-            print("err: \(error)")
             XCTAssertEqual(error.code, .InvalidPublicKey)
         } catch {
             XCTFail("Unexpected error type: \(type(of: error))")
