@@ -153,9 +153,9 @@ public class Connect {
         
         let keys = input.keys.map { $0.lowercased() }
         
-        if keys.count > 2 || (keys.count == 2 && !keys.contains("gandalf")) {
+        if keys.count < 1 {
             throw GandalfError(
-                message: "Only one non-Gandalf service is supported per Connect URL",
+                message: "At least one service is needed.",
                 code: .InvalidService
             )
         }

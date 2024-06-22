@@ -89,8 +89,9 @@ final class ConnectTests: XCTestCase {
         let connect = Connect(input: input)
         
         do {
-            _ = try await connect.generateURL()
-            XCTFail("Expected to throw, but did not throw")
+            let generatedURL = try await connect.generateURL()
+            XCTAssertTrue(generatedURL.contains(publicKey))
+            XCTAssertTrue(generatedURL.contains(redirectURL))
         } catch let error as GandalfError {
             XCTAssertEqual(error.code, .InvalidService)
         } catch {

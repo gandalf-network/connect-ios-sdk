@@ -11,6 +11,7 @@ struct Example {
 func testConnect() async {
     let services: InputData = [
         "uber": .service(Service(traits: ["rating"], activities: ["trip"])),
+        "netflix": .service(Service(activities: ["watch"])),
     ]
     let input = ConnectInput(
         publicKey: "0x02073d3b9daf439c19a267dcfc19bc1ac1aea5066d8c754554b046476099b6fa22",
