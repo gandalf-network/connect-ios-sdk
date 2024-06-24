@@ -66,8 +66,15 @@ import GandalfConnect
 Create an instance of `ConnectInput` with the necessary details:
 
 ```swift
+<!-- One service -->
 let services: InputData = [
     "uber": .service(Service(traits: ["rating"], activities: ["trip"]))
+]
+
+<!-- Multiple services -->
+let services: InputData = [
+    "uber": .service(Service(traits: ["rating"], activities: ["trip"],  required: false)),
+    "netflix": .service(Service(activities: ["watch"])),
 ]
 
 let input = ConnectInput(

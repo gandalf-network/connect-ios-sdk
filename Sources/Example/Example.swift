@@ -10,7 +10,7 @@ struct Example {
 
 func testConnect() async {
     let services: InputData = [
-        "uber": .service(Service(traits: ["rating"], activities: ["trip"])),
+        "uber": .service(Service(traits: ["rating"], activities: ["trip"],  required: false)),
         "netflix": .service(Service(activities: ["watch"])),
     ]
     let input = ConnectInput(

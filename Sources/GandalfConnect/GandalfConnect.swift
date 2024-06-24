@@ -15,10 +15,12 @@ public struct GandalfError: Error {
 public struct Service {
     public var traits: [String]?
     public var activities: [String]?
+    public var required: Bool
     
-    public init(traits: [String]? = nil, activities: [String]? = nil) {
+    public init(traits: [String]? = nil, activities: [String]? = nil, required: Bool = true) {
         self.traits = traits
         self.activities = activities
+        self.required = required
     }
 }
 
@@ -74,7 +76,8 @@ public class Connect {
             case .service(let serviceValue):
                 dictionary[key] = [
                     "traits": serviceValue.traits ?? [],
-                    "activities": serviceValue.activities ?? []
+                    "activities": serviceValue.activities ?? [],
+                    "required": serviceValue.required
                 ]
             }
         }
@@ -121,6 +124,20 @@ public class Connect {
             try Self.validateRedirectURL(url: redirectURL)
             let cleanServices = try await Self.validateInputData(input: data)
             self.data = cleanServices
+            
+            // Validate that at least one service has the required property set to true
+            let hasRequiredService = cleanServices.values.contains { value in
+                switch value {
+                case .boolean(let isActive):
+                    return isActive
+                case .service(let serviceData):
+                    return serviceData.required
+                }
+            }
+            
+            if !hasRequiredService {
+                throw GandalfError(message: "At least one service must have the required property set to true", code: .InvalidService)
+            }
         }
         verificationComplete = true
     }

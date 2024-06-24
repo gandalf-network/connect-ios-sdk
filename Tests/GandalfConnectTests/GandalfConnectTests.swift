@@ -10,13 +10,13 @@ final class ConnectTests: XCTestCase {
     let invalidRedirectURL = "invalid-url"
     
     // Define services in terms of InputData
-    let services: InputData = ["uber": .service(Service(traits: ["rating"], activities: ["trip"]))]
-    let invalidServices: InputData = ["facebook": .service(Service(traits: ["plan"], activities: ["watch"]))]
-    let noRequiredServices: InputData = ["netflix": .service(Service(traits: [], activities: []))]
+    let services: InputData = ["uber": .service(Service(traits: ["rating"], activities: ["trip"], required: true))]
+    let invalidServices: InputData = ["facebook": .service(Service(traits: ["plan"], activities: ["watch"], required: true))]
+    let noRequiredServices: InputData = ["netflix": .service(Service(traits: [], activities: [], required: false))]
     let multipleServices: InputData = [
-        "uber": .service(Service(traits: ["rating"], activities: ["trip"])),
-        "netflix": .service(Service(traits: ["plan"], activities: ["watch"])),
-        "instacart": .service(Service(traits: [], activities: ["shop"]))
+        "uber": .service(Service(traits: ["rating"], activities: ["trip"], required: true)),
+        "netflix": .service(Service(traits: ["plan"], activities: ["watch"], required: false)),
+        "instacart": .service(Service(traits: [], activities: ["shop"], required: false))
     ]
 
     func testInitialization() {
@@ -70,7 +70,7 @@ final class ConnectTests: XCTestCase {
         }
     }
 
-    func testGenerateURLWithNoRequiredTraitOrActivity() async {
+    func testGenerateURLWithNoRequiredService() async {
         let input = ConnectInput(publicKey: publicKey, redirectURL: redirectURL, services: noRequiredServices)
         let connect = Connect(input: input)
         
