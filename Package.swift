@@ -16,13 +16,16 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apollographql/apollo-ios.git", .upToNextMajor(from: "1.12.2")),
-        .package(path: "./GandalfConnectAPI"),
+        .package(
+            url: "https://github.com/gandalf-network/gandalf-ios-apollo-api.git",
+            branch: "main"
+        )
     ],
     targets: [
         .target(
             name: "GandalfConnect",
             dependencies: [
-              .product(name: "GandalfConnectAPI", package: "GandalfConnectAPI"),
+              .product(name: "GandalfConnectAPI", package: "gandalf-ios-apollo-api"),
               .product(name: "Apollo", package: "apollo-ios"),
             ],
             path: "./Sources/GandalfConnect"
