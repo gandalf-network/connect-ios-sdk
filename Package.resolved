@@ -10,6 +10,15 @@
       }
     },
     {
+      "identity" : "gandalf-ios-apollo-api",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/gandalf-network/gandalf-ios-apollo-api.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "b5b32e9df4443c5b583dc5a81918aada9b30003c"
+      }
+    },
+    {
       "identity" : "sqlite.swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/stephencelis/SQLite.swift.git",
