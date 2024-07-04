@@ -19,7 +19,6 @@ final class ConnectTests: XCTestCase {
         "instacart": .service(Service(traits: [], activities: ["shop"], required: false))
     ]
     let styling = StylingOptions(primaryColor: "#7949D1", backgroundColor: "#fff000", foregroundColor: "#562BA6", accentColor: "#F4F0FB")
-    let connectOptions = ConnectOptions(style: styling)
 
     func testInitialization() {
         let input = ConnectInput(publicKey: publicKey, redirectURL: redirectURL, services: services)
@@ -102,6 +101,7 @@ final class ConnectTests: XCTestCase {
     }
 
     func testGenerateURLWithStylingOptions() async {
+        let connectOptions = ConnectOptions(style: styling)
         let input = ConnectInput(publicKey: publicKey, redirectURL: redirectURL, services: multipleServices, options: connectOptions)
         let connect = Connect(input: input)
         
