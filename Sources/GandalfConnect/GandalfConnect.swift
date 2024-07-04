@@ -48,7 +48,7 @@ public struct ConnectInput {
     public var services: InputData
     public var options: ConnectOptions? = nil
     
-    public init(publicKey: String, redirectURL: String, services: InputData, options: ConnectOptions) {
+    public init(publicKey: String, redirectURL: String, services: InputData, options: ConnectOptions? = nil) {
         self.publicKey = publicKey
         self.redirectURL = redirectURL
         self.services = services
