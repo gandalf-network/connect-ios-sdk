@@ -12,6 +12,28 @@ public struct GandalfError: Error {
     public let code: GandalfErrorCode
 }
 
+public struct StylingOptions {
+    public var primaryColor: String?
+    public var backgroundColor: String?
+    public var foregroundColor: String?
+    public var accentColor: String?
+
+    public init(primaryColor: String? = nil, backgroundColor: String? = nil, foregroundColor: String? = nil, accentColor: String? = nil) {
+        self.primaryColor = primaryColor
+        self.backgroundColor = backgroundColor
+        self.foregroundColor = foregroundColor
+        self.accentColor = accentColor
+    }
+}
+
+public struct ConnectOptions {
+    public var style: StylingOptions
+
+    public init(style: StylingOptions) {
+        self.style = style
+    }
+}
+
 public struct Service {
     public var traits: [String]?
     public var activities: [String]?
@@ -35,11 +57,13 @@ public struct ConnectInput {
     public var publicKey: String
     public var redirectURL: String
     public var services: InputData
+    public var options: ConnectOptions? = nil
     
-    public init(publicKey: String, redirectURL: String, services: InputData) {
+    public init(publicKey: String, redirectURL: String, services: InputData, options: ConnectOptions? = nil) {
         self.publicKey = publicKey
         self.redirectURL = redirectURL
         self.services = services
+        self.options = options
     }
 }
 
@@ -48,18 +72,26 @@ public class Connect {
     public var redirectURL: String
     public var data: InputData
     public var verificationComplete: Bool = false
+    public var options: ConnectOptions? = nil
     
     public init(input: ConnectInput) {
         self.publicKey = input.publicKey
         self.redirectURL = input.redirectURL.hasSuffix("/") ? String(input.redirectURL.dropLast()) : input.redirectURL
         self.data = input.services
+        self.options = input.options
     }
     
     public func generateURL() async throws -> String {
         let inputData = data
         try await allValidations(publicKey: publicKey, redirectURL: redirectURL, data: inputData)
+
+        var inputDataDictionary = self.dataToDictionary(inputData)
+
+        if let style = options?.style {
+            inputDataDictionary["options"] = styleToDictionary(style)
+        }
         
-        let jsonData = try JSONSerialization.data(withJSONObject: self.dataToDictionary(self.data))
+        let jsonData = try JSONSerialization.data(withJSONObject: inputDataDictionary)
         let dataString = String(data: jsonData, encoding: .utf8) ?? ""
         print(jsonData)
         
@@ -80,6 +112,23 @@ public class Connect {
                     "required": serviceValue.required
                 ]
             }
+        }
+        return dictionary
+    }
+
+    private func styleToDictionary(_ style: StylingOptions) -> [String: Any] {
+        var dictionary: [String: Any] = [:]
+        if let primaryColor = style.primaryColor {
+            dictionary["primaryColor"] = primaryColor
+        }
+        if let backgroundColor = style.backgroundColor {
+            dictionary["backgroundColor"] = backgroundColor
+        }
+        if let foregroundColor = style.foregroundColor {
+            dictionary["foregroundColor"] = foregroundColor
+        }
+        if let accentColor = style.accentColor {
+            dictionary["accentColor"] = accentColor
         }
         return dictionary
     }

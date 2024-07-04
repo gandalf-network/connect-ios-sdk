@@ -77,10 +77,22 @@ let services: InputData = [
     "netflix": .service(Service(activities: ["watch"])),
 ]
 
+<!-- styling parameters to modify the Connect UI -->
+let style = StylingOptions(
+    primaryColor: "#7949D1", 
+    backgroundColor: "#fff", 
+    foregroundColor: "#562BA6", 
+    accentColor: "#F4F0FB",
+)
+
+let options = ConnectOptions(style: style)
+
 let input = ConnectInput(
     publicKey: "yourPublicKey",
     redirectURL: "https://example.com",
-    services: services
+    services: services,
+    // Optional styling parameter to modify the Connect UI
+    options: options
 )
 ```
 

@@ -18,6 +18,7 @@ final class ConnectTests: XCTestCase {
         "netflix": .service(Service(traits: ["plan"], activities: ["watch"], required: false)),
         "instacart": .service(Service(traits: [], activities: ["shop"], required: false))
     ]
+    let styling = StylingOptions(primaryColor: "#7949D1", backgroundColor: "#fff000", foregroundColor: "#562BA6", accentColor: "#F4F0FB")
 
     func testInitialization() {
         let input = ConnectInput(publicKey: publicKey, redirectURL: redirectURL, services: services)
@@ -86,6 +87,22 @@ final class ConnectTests: XCTestCase {
 
     func testGenerateURLWithMultipleServices() async {
         let input = ConnectInput(publicKey: publicKey, redirectURL: redirectURL, services: multipleServices)
+        let connect = Connect(input: input)
+        
+        do {
+            let generatedURL = try await connect.generateURL()
+            XCTAssertTrue(generatedURL.contains(publicKey))
+            XCTAssertTrue(generatedURL.contains(redirectURL))
+        } catch let error as GandalfError {
+            XCTAssertEqual(error.code, .InvalidService)
+        } catch {
+            XCTFail("Unexpected error type: \(type(of: error))")
+        }
+    }
+
+    func testGenerateURLWithStylingOptions() async {
+        let connectOptions = ConnectOptions(style: styling)
+        let input = ConnectInput(publicKey: publicKey, redirectURL: redirectURL, services: multipleServices, options: connectOptions)
         let connect = Connect(input: input)
         
         do {
