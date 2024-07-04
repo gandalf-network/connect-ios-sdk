@@ -74,7 +74,7 @@ public class Connect {
         let inputData = data
         try await allValidations(publicKey: publicKey, redirectURL: redirectURL, data: inputData)
 
-        let inputDataDictionary = self.dataToDictionary(inputData)
+        var inputDataDictionary = self.dataToDictionary(inputData)
 
         if let style = options?.style {
             inputDataDictionary.merge(self.styleToDictionary(style)) { (current, _) in current }
