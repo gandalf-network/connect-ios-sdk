@@ -17,10 +17,21 @@ public struct StylingOptions {
     public var backgroundColor: String?
     public var foregroundColor: String?
     public var accentColor: String?
+
+    public init(primaryColor: String? = nil, backgroundColor: String? = nil, foregroundColor: String? = nil, accentColor: String? = nil) {
+        self.primaryColor = primaryColor
+        self.backgroundColor = backgroundColor
+        self.foregroundColor = foregroundColor
+        self.accentColor = accentColor
+    }
 }
 
 public struct ConnectOptions {
     public var style: StylingOptions
+
+    public init(style: StylingOptions) {
+        self.style = style
+    }
 }
 
 public struct Service {
