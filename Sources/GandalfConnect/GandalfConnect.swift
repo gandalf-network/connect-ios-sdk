@@ -88,7 +88,7 @@ public class Connect {
         var inputDataDictionary = self.dataToDictionary(inputData)
 
         if let style = options?.style {
-            inputDataDictionary.merge(self.styleToDictionary(style)) { (current, _) in current }
+            inputDataDictionary["options"] = styleToDictionary(style)
         }
         
         let jsonData = try JSONSerialization.data(withJSONObject: inputDataDictionary)
