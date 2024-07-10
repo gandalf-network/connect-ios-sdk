@@ -66,6 +66,15 @@ import GandalfConnect
 Create an instance of `ConnectInput` with the necessary details:
 
 ```swift
+<!-- styling parameters to modify the Connect UI -->
+let style = StylingOptions(
+    primaryColor: "#7949D1", 
+    backgroundColor: "#fff", 
+    foregroundColor: "#562BA6", 
+    accentColor: "#F4F0FB",
+)
+let options = ConnectOptions(style: style)
+
 <!-- One service -->
 let services: InputData = [
     "uber": .service(Service(traits: ["rating"], activities: ["trip"]))
@@ -77,15 +86,11 @@ let services: InputData = [
     "netflix": .service(Service(activities: ["watch"])),
 ]
 
-<!-- styling parameters to modify the Connect UI -->
-let style = StylingOptions(
-    primaryColor: "#7949D1", 
-    backgroundColor: "#fff", 
-    foregroundColor: "#562BA6", 
-    accentColor: "#F4F0FB",
-)
-
-let options = ConnectOptions(style: style)
+<!-- Timeframe -->
+let amazonTimeFrame = TimeFrame(startDate: "2023-10-31", endDate: "2024-04-01")
+let services: InputData = [
+    "amazon": .service(Service(activities: ["shop"], timeFrame: amazonTimeFrame)),
+]
 
 let input = ConnectInput(
     publicKey: "yourPublicKey",
@@ -95,6 +100,8 @@ let input = ConnectInput(
     options: options
 )
 ```
+
+**Note:** The `timeframe` prop is currently only supported on the `amazon` service. It allows you to get amazon orders within a particular timeframe. The duration of the timeframe should not be more than two years from the current date
 
 Initialize the `Connect` class:
 
