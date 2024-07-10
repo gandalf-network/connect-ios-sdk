@@ -318,7 +318,7 @@ public class Connect {
             
             // Ensure duration between startDate and endDate is not more than 2 years
             let components = calendar.dateComponents([.year], from: startDate, to: endDate)
-            guard let years = components.year, years <= 2 else {
+            guard let years = components.year, years <= 1 else {
                 throw GandalfError(message: "The duration between startDate and endDate should not be more than 2 years", code: .InvalidTimeFrame)
             }
         }
