@@ -316,10 +316,10 @@ public class Connect {
                 throw GandalfError(message: "startDate should be before endDate", code: .InvalidTimeFrame)
             }
             
-            // Ensure duration between startDate and endDate is not more than 2 years
-            let components = calendar.dateComponents([.year], from: startDate, to: endDate)
-            guard let years = components.year, years <= 1 else {
-                throw GandalfError(message: "The duration between startDate and endDate should not be more than 2 years", code: .InvalidTimeFrame)
+            // Ensure startDate is within 2 calendar years of endDate
+            let startDateYear = calendar.component(.year, from: startDate)
+            guard endDateYear - startDateYear <= 1 else { // Using 1 to check within 2 calendar years
+                throw GandalfError(message: "startDate should be within 2 calendar years of endDate", code: .InvalidTimeFrame)
             }
         }
         
