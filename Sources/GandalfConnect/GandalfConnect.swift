@@ -299,6 +299,7 @@ public class Connect {
 
             let currentDate = Date()
             let calendar = Calendar.current
+            let currentDateStr = dateFormatter.string(from: currentDate)
             
             // Ensure endDate is not after the current date and falls within the current year
             guard endDate <= currentDate else {
@@ -321,7 +322,7 @@ public class Connect {
             guard endDateYear - startDateYear <= 1 else { // Using 1 to check within 2 calendar years
                 let allowedStartDate = calendar.date(byAdding: .year, value: -1, to: calendar.date(from: DateComponents(year: endDateYear, month: 1, day: 1))!)!
                 let allowedStartDateStr = dateFormatter.string(from: allowedStartDate)
-                throw GandalfError(message: "Invalid Date. Allowed range is from \(allowedStartDateStr) to \(endDateStr)", code: .InvalidTimeFrame)
+                throw GandalfError(message: "Invalid timeframe. Allowed range is from \(allowedStartDateStr) to \(currentDateStr)", code: .InvalidTimeFrame)
             }
         }
         
