@@ -319,7 +319,9 @@ public class Connect {
             // Ensure startDate is within 2 calendar years of endDate
             let startDateYear = calendar.component(.year, from: startDate)
             guard endDateYear - startDateYear <= 1 else { // Using 1 to check within 2 calendar years
-                throw GandalfError(message: "startDate should be within 2 calendar years of endDate", code: .InvalidTimeFrame)
+                let allowedStartDate = calendar.date(byAdding: .year, value: -1, to: calendar.date(from: DateComponents(year: endDateYear, month: 1, day: 1))!)!
+                let allowedStartDateStr = dateFormatter.string(from: allowedStartDate)
+                throw GandalfError(message: "Invalid Date. Allowed range is from \(allowedStartDateStr) to \(endDateStr)", code: .InvalidTimeFrame)
             }
         }
         
@@ -342,14 +344,14 @@ public class Connect {
             }
         }
         
-        if !unsupportedActivities.isEmpty {
+        if (!unsupportedActivities.isEmpty) {
             throw GandalfError(
                 message: "These activities [ \(unsupportedActivities.joined(separator: ", ")) ] are unsupported",
                 code: .InvalidService
             )
         }
         
-        if !unsupportedTraits.isEmpty {
+        if (!unsupportedTraits.isEmpty) {
             throw GandalfError(
                 message: "These traits [ \(unsupportedTraits.joined(separator: ", ")) ] are unsupported",
                 code: .InvalidService
