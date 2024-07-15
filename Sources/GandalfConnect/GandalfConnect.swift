@@ -35,7 +35,7 @@ public struct ConnectOptions {
     }
 }
 
-public struct TimeFrame {
+public struct Timeframe {
     public let startDate: String?
     public let endDate: String?
     
@@ -48,13 +48,13 @@ public struct TimeFrame {
 public struct Service {
     public var traits: [String]?
     public var activities: [String]?
-    public var timeFrame: TimeFrame?
+    public var timeframe: Timeframe?
     public var required: Bool
     
-    public init(traits: [String]? = nil, activities: [String]? = nil, timeFrame: TimeFrame? = nil, required: Bool = true) {
+    public init(traits: [String]? = nil, activities: [String]? = nil, timeframe: Timeframe? = nil, required: Bool = true) {
         self.traits = traits
         self.activities = activities
-        self.timeFrame = timeFrame
+        self.timeframe = timeframe
         self.required = required
     }
 }
@@ -124,10 +124,10 @@ public class Connect {
                     "activities": serviceValue.activities ?? [],
                     "required": serviceValue.required
                 ]
-                if let timeFrame = serviceValue.timeFrame {
-                    serviceDict["timeFrame"] = [
-                        "startDate": timeFrame.startDate ?? "",
-                        "endDate": timeFrame.endDate ?? ""
+                if let timeframe = serviceValue.timeframe {
+                    serviceDict["timeframe"] = [
+                        "startDate": timeframe.startDate ?? "",
+                        "endDate": timeframe.endDate ?? ""
                     ]
                 }
                 dictionary[key] = serviceDict
@@ -287,12 +287,12 @@ public class Connect {
             )
         }
         
-        if let timeFrame = input.timeFrame {
+        if let timeframe = input.timeframe {
             guard serviceName.lowercased() == "amazon" else {
-                throw GandalfError(message: "TimeFrame is only applicable for the 'amazon' service", code: .InvalidService)
+                throw GandalfError(message: "Timeframe is only applicable for the 'amazon' service", code: .InvalidService)
             }
             
-            guard let startDateStr = timeFrame.startDate, let endDateStr = timeFrame.endDate,
+            guard let startDateStr = timeframe.startDate, let endDateStr = timeframe.endDate,
                 let startDate = dateFormatter.date(from: startDateStr), let endDate = dateFormatter.date(from: endDateStr) else {
                 throw GandalfError(message: "Invalid date format for startDate or endDate", code: .InvalidTimeFrame)
             }
