@@ -87,9 +87,9 @@ let services: InputData = [
 ]
 
 <!-- Timeframe -->
-let amazonTimeFrame = Timeframe(startDate: "2023-10-31", endDate: "2024-04-01")
+let amazonTimeframe = Timeframe(endDate: "12/31/2023") // Date format: "MM/dd/yyyy"
 let services: InputData = [
-    "amazon": .service(Service(activities: ["shop"], timeframe: amazonTimeFrame)),
+    "amazon": .service(Service(activities: ["shop"], timeframe: amazonTimeframe)),
 ]
 
 let input = ConnectInput(

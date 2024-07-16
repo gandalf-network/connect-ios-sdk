@@ -36,11 +36,9 @@ public struct ConnectOptions {
 }
 
 public struct Timeframe {
-    public let startDate: String?
     public let endDate: String?
     
-    public init(startDate: String?, endDate: String?) {
-        self.startDate = startDate
+    public init(endDate: String?) {
         self.endDate = endDate
     }
 }
@@ -126,7 +124,6 @@ public class Connect {
                 ]
                 if let timeframe = serviceValue.timeframe {
                     serviceDict["timeframe"] = [
-                        "startDate": timeframe.startDate ?? "",
                         "endDate": timeframe.endDate ?? ""
                     ]
                 }
@@ -292,9 +289,9 @@ public class Connect {
                 throw GandalfError(message: "Timeframe is only applicable for the 'amazon' service", code: .InvalidService)
             }
             
-            guard let startDateStr = timeframe.startDate, let endDateStr = timeframe.endDate,
-                let startDate = dateFormatter.date(from: startDateStr), let endDate = dateFormatter.date(from: endDateStr) else {
-                throw GandalfError(message: "Invalid date format for startDate or endDate", code: .InvalidTimeFrame)
+            guard let endDateStr = timeframe.endDate,
+                let endDate = dateFormatter.date(from: endDateStr) else {
+                throw GandalfError(message: "Invalid date format for endDate", code: .InvalidTimeFrame)
             }
 
             let currentDate = Date()
@@ -306,23 +303,12 @@ public class Connect {
                 throw GandalfError(message: "endDate should not be after the current date", code: .InvalidTimeFrame)
             }
             
+            // Ensure endDate is within 2 calendar years
             let currentYear = calendar.component(.year, from: currentDate)
-            let endDateYear = calendar.component(.year, from: endDate)
-            guard endDateYear == currentYear else {
-                throw GandalfError(message: "endDate should fall within the current year", code: .InvalidTimeFrame)
-            }
-            
-            // Ensure startDate is before endDate
-            guard startDate < endDate else {
-                throw GandalfError(message: "startDate should be before endDate", code: .InvalidTimeFrame)
-            }
-            
-            // Ensure startDate is within 2 calendar years of endDate
-            let startDateYear = calendar.component(.year, from: startDate)
-            guard endDateYear - startDateYear <= 1 else { // Using 1 to check within 2 calendar years
-                let allowedStartDate = calendar.date(byAdding: .year, value: -1, to: calendar.date(from: DateComponents(year: endDateYear, month: 1, day: 1))!)!
-                let allowedStartDateStr = dateFormatter.string(from: allowedStartDate)
-                throw GandalfError(message: "Invalid timeframe. Allowed range is from \(allowedStartDateStr) to \(currentDateStr)", code: .InvalidTimeFrame)
+            let allowedEndDate = calendar.date(byAdding: .year, value: -1, to: calendar.date(from: DateComponents(year: currentYear, month: 1, day: 1))!)!
+            let allowedEndDateStr = dateFormatter.string(from: allowedEndDate)
+            guard endDate >= allowedEndDate else {
+                throw GandalfError(message: "Invalid timeframe. Allowed range is from \(allowedEndDateStr) to \(currentDateStr)", code: .InvalidTimeFrame)
             }
         }
         
@@ -368,7 +354,7 @@ public class Connect {
 
     private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.dateFormat = "MM/dd/yyyy"
         return formatter
     }()
 }
