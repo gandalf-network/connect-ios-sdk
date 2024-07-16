@@ -20,6 +20,14 @@ final class ConnectTests: XCTestCase {
     ]
     let styling = StylingOptions(primaryColor: "#7949D1", backgroundColor: "#fff000", foregroundColor: "#562BA6", accentColor: "#F4F0FB")
 
+    // Define current date for testing
+    let currentDate = Date()
+    let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM/dd/yyyy"
+        return formatter
+    }()
+    
     func testInitialization() {
         let input = ConnectInput(publicKey: publicKey, redirectURL: redirectURL, services: services)
         let connect = Connect(input: input)
@@ -133,6 +141,59 @@ final class ConnectTests: XCTestCase {
             XCTFail("Expected to throw, but did not throw")
         } catch let error as GandalfError {
             XCTAssertEqual(error.code, .DataKeyNotFound)
+        } catch {
+            XCTFail("Unexpected error type: \(type(of: error))")
+        }
+    }
+
+    func testGenerateURLWithAmazonServiceValidTimeFrame() async {
+        let startDate = dateFormatter.string(from: Calendar.current.date(byAdding: .month, value: -6, to: currentDate)!)
+        let timeframe = Timeframe(startDate: startDate)
+        let amazonService = Service(activities: ["shop"], timeframe: timeframe, required: true)
+        let inputData: InputData = ["amazon": .service(amazonService)]
+        let input = ConnectInput(publicKey: publicKey, redirectURL: redirectURL, services: inputData)
+        let connect = Connect(input: input)
+
+        do {
+            let generatedURL = try await connect.generateURL()
+            XCTAssertTrue(generatedURL.contains(publicKey))
+            XCTAssertTrue(generatedURL.contains(redirectURL))
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func testGenerateURLWithAmazonServiceInvalidStartDate() async {
+        let startDate = dateFormatter.string(from: Calendar.current.date(byAdding: .year, value: 1, to: currentDate)!) // Invalid startDate (next year)
+        let timeframe = Timeframe(startDate: startDate)
+        let amazonService = Service(traits: ["prime"], activities: ["shop"], timeframe: timeframe, required: true)
+        let inputData: InputData = ["amazon": .service(amazonService)]
+        let input = ConnectInput(publicKey: publicKey, redirectURL: redirectURL, services: inputData)
+        let connect = Connect(input: input)
+
+        do {
+            _ = try await connect.generateURL()
+            XCTFail("Expected to throw, but did not throw")
+        } catch let error as GandalfError {
+            XCTAssertEqual(error.code, .InvalidTimeFrame)
+        } catch {
+            XCTFail("Unexpected error type: \(type(of: error))")
+        }
+    }
+
+    func testGenerateURLWithAmazonServiceStartDateTooOld() async {
+        let startDate = dateFormatter.string(from: Calendar.current.date(byAdding: .year, value: -3, to: currentDate)!)
+        let timeframe = Timeframe(startDate: startDate)
+        let amazonService = Service(activities: ["shop"], timeframe: timeframe, required: true)
+        let inputData: InputData = ["amazon": .service(amazonService)]
+        let input = ConnectInput(publicKey: publicKey, redirectURL: redirectURL, services: inputData)
+        let connect = Connect(input: input)
+
+        do {
+            _ = try await connect.generateURL()
+            XCTFail("Expected to throw, but did not throw")
+        } catch let error as GandalfError {
+            XCTAssertEqual(error.code, .InvalidTimeFrame)
         } catch {
             XCTFail("Unexpected error type: \(type(of: error))")
         }

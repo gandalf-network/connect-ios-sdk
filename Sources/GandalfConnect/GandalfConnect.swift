@@ -5,6 +5,7 @@ public enum GandalfErrorCode: String {
     case InvalidPublicKey
     case InvalidService
     case InvalidRedirectURL
+    case InvalidTimeFrame
 }
 
 public struct GandalfError: Error {
@@ -34,14 +35,24 @@ public struct ConnectOptions {
     }
 }
 
+public struct Timeframe {
+    public let startDate: String?
+    
+    public init(startDate: String?) {
+        self.startDate = startDate
+    }
+}
+
 public struct Service {
     public var traits: [String]?
     public var activities: [String]?
+    public var timeframe: Timeframe?
     public var required: Bool
     
-    public init(traits: [String]? = nil, activities: [String]? = nil, required: Bool = true) {
+    public init(traits: [String]? = nil, activities: [String]? = nil, timeframe: Timeframe? = nil, required: Bool = true) {
         self.traits = traits
         self.activities = activities
+        self.timeframe = timeframe
         self.required = required
     }
 }
@@ -106,11 +117,17 @@ public class Connect {
             case .boolean(let boolValue):
                 dictionary[key] = boolValue
             case .service(let serviceValue):
-                dictionary[key] = [
+                var serviceDict: [String: Any] = [
                     "traits": serviceValue.traits ?? [],
                     "activities": serviceValue.activities ?? [],
                     "required": serviceValue.required
                 ]
+                if let timeframe = serviceValue.timeframe {
+                    serviceDict["timeframe"] = [
+                        "startDate": timeframe.startDate ?? ""
+                    ]
+                }
+                dictionary[key] = serviceDict
             }
         }
         return dictionary
@@ -242,14 +259,13 @@ public class Connect {
                         )
                     }
                     cleanServices[key] = service
-                    
                 case .service(let serviceData):
-                    try validateInputService(input: serviceData, supportedServicesAndTraits: supportedServicesAndTraits)
+                    try validateInputService(input: serviceData, serviceName: key, supportedServicesAndTraits: supportedServicesAndTraits)
                     cleanServices[key] = service
                 }
             }
         }
-        
+
         if !unsupportedServices.isEmpty {
             throw GandalfError(
                 message: "These services [ \(unsupportedServices.joined(separator: ", ")) ] are unsupported",
@@ -259,13 +275,41 @@ public class Connect {
         
         return cleanServices
     }
-    
-    private static func validateInputService(input: Service, supportedServicesAndTraits: SupportedServicesAndTraits) throws {
+
+    private static func validateInputService(input: Service, serviceName: String, supportedServicesAndTraits: SupportedServicesAndTraits) throws {
         if (input.activities?.count ?? 0) < 1 && (input.traits?.count ?? 0) < 1 {
             throw GandalfError(
                 message: "At least one trait or activity is required",
                 code: .InvalidService
             )
+        }
+        
+        if let timeframe = input.timeframe {
+            guard serviceName.lowercased() == "amazon" else {
+                throw GandalfError(message: "Timeframe is only applicable for the 'amazon' service", code: .InvalidService)
+            }
+            
+            guard let startDateStr = timeframe.startDate,
+                let startDate = dateFormatter.date(from: startDateStr) else {
+                throw GandalfError(message: "Invalid date format for startDate", code: .InvalidTimeFrame)
+            }
+
+            let currentDate = Date()
+            let calendar = Calendar.current
+            let currentDateStr = dateFormatter.string(from: currentDate)
+            
+            // Ensure startDate is not after the current date and falls within the current year
+            guard startDate <= currentDate else {
+                throw GandalfError(message: "startDate should not be after the current date", code: .InvalidTimeFrame)
+            }
+            
+            // Ensure startDate is within 2 calendar years
+            let currentYear = calendar.component(.year, from: currentDate)
+            let allowedStartDate = calendar.date(byAdding: .year, value: -1, to: calendar.date(from: DateComponents(year: currentYear, month: 1, day: 1))!)!
+            let allowedStartDateStr = dateFormatter.string(from: allowedStartDate)
+            guard startDate >= allowedStartDate else {
+                throw GandalfError(message: "Invalid timeframe. Allowed range is from \(allowedStartDateStr) to \(currentDateStr)", code: .InvalidTimeFrame)
+            }
         }
         
         var unsupportedActivities: [String] = []
@@ -287,24 +331,30 @@ public class Connect {
             }
         }
         
-        if !unsupportedActivities.isEmpty {
+        if (!unsupportedActivities.isEmpty) {
             throw GandalfError(
                 message: "These activities [ \(unsupportedActivities.joined(separator: ", ")) ] are unsupported",
                 code: .InvalidService
             )
         }
         
-        if !unsupportedTraits.isEmpty {
+        if (!unsupportedTraits.isEmpty) {
             throw GandalfError(
                 message: "These traits [ \(unsupportedTraits.joined(separator: ", ")) ] are unsupported",
                 code: .InvalidService
             )
         }
     }
-    
+
     private static func validateRedirectURL(url: String) throws {
         guard URL(string: url) != nil else {
             throw GandalfError(message: "Invalid redirectURL", code: .InvalidRedirectURL)
         }
     }
+
+    private static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM/dd/yyyy"
+        return formatter
+    }()
 }

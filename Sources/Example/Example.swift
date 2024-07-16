@@ -9,9 +9,11 @@ struct Example {
 }
 
 func testConnect() async {
+    let amazonTimeFrame = Timeframe(startDate: "12/31/2023")
     let services: InputData = [
         "uber": .service(Service(traits: ["rating"], activities: ["trip"],  required: false)),
         "netflix": .service(Service(activities: ["watch"])),
+        "amazon": .service(Service(activities: ["shop"], timeframe: amazonTimeFrame)),
     ]
     let style = StylingOptions(primaryColor: "#7949D1", backgroundColor: "#fff000", foregroundColor: "#562BA6", accentColor: "#F4F0FB")
     let connectOptions = ConnectOptions(style: style)
