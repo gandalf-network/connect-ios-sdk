@@ -147,8 +147,8 @@ final class ConnectTests: XCTestCase {
     }
 
     func testGenerateURLWithAmazonServiceValidTimeFrame() async {
-        let endDate = dateFormatter.string(from: Calendar.current.date(byAdding: .month, value: -6, to: currentDate)!)
-        let timeframe = Timeframe(endDate: endDate)
+        let startDate = dateFormatter.string(from: Calendar.current.date(byAdding: .month, value: -6, to: currentDate)!)
+        let timeframe = Timeframe(startDate: startDate)
         let amazonService = Service(activities: ["shop"], timeframe: timeframe, required: true)
         let inputData: InputData = ["amazon": .service(amazonService)]
         let input = ConnectInput(publicKey: publicKey, redirectURL: redirectURL, services: inputData)
@@ -163,9 +163,9 @@ final class ConnectTests: XCTestCase {
         }
     }
 
-    func testGenerateURLWithAmazonServiceInvalidEndDate() async {
-        let endDate = dateFormatter.string(from: Calendar.current.date(byAdding: .year, value: 1, to: currentDate)!) // Invalid endDate (next year)
-        let timeframe = Timeframe(endDate: endDate)
+    func testGenerateURLWithAmazonServiceInvalidStartDate() async {
+        let startDate = dateFormatter.string(from: Calendar.current.date(byAdding: .year, value: 1, to: currentDate)!) // Invalid startDate (next year)
+        let timeframe = Timeframe(startDate: startDate)
         let amazonService = Service(traits: ["prime"], activities: ["shop"], timeframe: timeframe, required: true)
         let inputData: InputData = ["amazon": .service(amazonService)]
         let input = ConnectInput(publicKey: publicKey, redirectURL: redirectURL, services: inputData)
@@ -181,9 +181,9 @@ final class ConnectTests: XCTestCase {
         }
     }
 
-    func testGenerateURLWithAmazonServiceEndDateTooOld() async {
-        let endDate = dateFormatter.string(from: Calendar.current.date(byAdding: .year, value: -3, to: currentDate)!) // Invalid, startDate more than 2 years before endDate
-        let timeframe = Timeframe(endDate: endDate)
+    func testGenerateURLWithAmazonServiceStartDateTooOld() async {
+        let startDate = dateFormatter.string(from: Calendar.current.date(byAdding: .year, value: -3, to: currentDate)!)
+        let timeframe = Timeframe(startDate: startDate)
         let amazonService = Service(activities: ["shop"], timeframe: timeframe, required: true)
         let inputData: InputData = ["amazon": .service(amazonService)]
         let input = ConnectInput(publicKey: publicKey, redirectURL: redirectURL, services: inputData)

@@ -9,7 +9,7 @@ struct Example {
 }
 
 func testConnect() async {
-    let amazonTimeFrame = Timeframe(endDate: "12/31/2023")
+    let amazonTimeFrame = Timeframe(startDate: "12/31/2023")
     let services: InputData = [
         "uber": .service(Service(traits: ["rating"], activities: ["trip"],  required: false)),
         "netflix": .service(Service(activities: ["watch"])),
