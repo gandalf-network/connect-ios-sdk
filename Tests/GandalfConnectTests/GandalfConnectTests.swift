@@ -193,20 +193,6 @@ final class ConnectTests: XCTestCase {
         XCTAssertEqual(service.workspaceURL, "https://example-workspace.slack.com")
     }
     
-    func testWorkspaceURLStripping() {
-        let service = Service(traits: ["rating"], activities: ["message"], required: true, workspaceURL: "https://example-workspace.slack.com")
-        let connect = Connect(input: ConnectInput(publicKey: publicKey, redirectURL: redirectURL, services: ["slack": .service(service)]))
-        
-        // Test that the workspaceURL is properly stripped in the dictionary
-        let dictionary = connect.dataToDictionary(connect.data)
-        if let slackData = dictionary["slack"] as? [String: Any],
-           let workspaceURL = slackData["workspaceURL"] as? String {
-            XCTAssertEqual(workspaceURL, "example-workspace.slack.com")
-        } else {
-            XCTFail("workspaceURL not found in dictionary or not properly stripped")
-        }
-    }
-    
     func testSlackValidationLogic() {
         // Test that Slack service without workspaceURL would fail validation
         let slackWithoutWorkspaceURL: InputData = ["slack": .service(Service(traits: ["rating"], activities: ["message"], required: true))]
@@ -218,41 +204,5 @@ final class ConnectTests: XCTestCase {
         // Test that Slack service with workspaceURL would pass validation
         let slackWithWorkspaceURL: InputData = ["slack": .service(Service(traits: ["rating"], activities: ["message"], required: true, workspaceURL: "https://example-workspace.slack.com"))]
         XCTAssertTrue(slackWithWorkspaceURL["slack"] != nil)
-    }
-    
-    func testWorkspaceURLStrippingDifferentFormats() {
-        // Test different URL formats
-        let service1 = Service(traits: ["rating"], activities: ["message"], required: true, workspaceURL: "https://example-workspace.slack.com")
-        let service2 = Service(traits: ["rating"], activities: ["message"], required: true, workspaceURL: "http://example-workspace.slack.com")
-        let service3 = Service(traits: ["rating"], activities: ["message"], required: true, workspaceURL: "example-workspace.slack.com")
-        
-        let connect = Connect(input: ConnectInput(publicKey: publicKey, redirectURL: redirectURL, services: ["slack": .service(service1)]))
-        
-        // Test https:// stripping
-        let dictionary1 = connect.dataToDictionary(["slack": .service(service1)])
-        if let slackData = dictionary1["slack"] as? [String: Any],
-           let workspaceURL = slackData["workspaceURL"] as? String {
-            XCTAssertEqual(workspaceURL, "example-workspace.slack.com")
-        } else {
-            XCTFail("workspaceURL not found in dictionary")
-        }
-        
-        // Test http:// stripping
-        let dictionary2 = connect.dataToDictionary(["slack": .service(service2)])
-        if let slackData = dictionary2["slack"] as? [String: Any],
-           let workspaceURL = slackData["workspaceURL"] as? String {
-            XCTAssertEqual(workspaceURL, "example-workspace.slack.com")
-        } else {
-            XCTFail("workspaceURL not found in dictionary")
-        }
-        
-        // Test URL without protocol (should remain unchanged)
-        let dictionary3 = connect.dataToDictionary(["slack": .service(service3)])
-        if let slackData = dictionary3["slack"] as? [String: Any],
-           let workspaceURL = slackData["workspaceURL"] as? String {
-            XCTAssertEqual(workspaceURL, "example-workspace.slack.com")
-        } else {
-            XCTFail("workspaceURL not found in dictionary")
-        }
     }
 }

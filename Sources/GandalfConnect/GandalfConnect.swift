@@ -102,7 +102,7 @@ public class Connect {
         return appClipURL
     }
     
-    func dataToDictionary(_ inputData: InputData) -> [String: Any] {
+    private func dataToDictionary(_ inputData: InputData) -> [String: Any] {
         var dictionary: [String: Any] = [:]
         for (key, value) in inputData {
             switch value {
@@ -264,7 +264,7 @@ public class Connect {
                     
                     // Validate Slack service requires workspaceURL
                     if key.lowercased() == "slack" {
-                        if serviceData.workspaceURL == nil || serviceData.workspaceURL!.isEmpty {
+                        if serviceData.workspaceURL?.isEmpty != false  {
                             throw GandalfError(
                                 message: "Slack service requires a workspaceURL",
                                 code: .MissingWorkspaceURL
