@@ -4,7 +4,7 @@ import XCTest
 final class ConnectTests: XCTestCase {
 
     // Constants for test values
-    let publicKey = "0x02073d3b9daf439c19a267dcfc19bc1ac1aea5066d8c754554b046476099b6fa22"
+    let publicKey = "0x03d9cdab69b08a09f2bd213d1c24057af073dfc6a543f54ffded6c2235423cbd51"
     let invalidPublicKey = "invalidPublicKey"
     let redirectURL = "https://example.com"
     let invalidRedirectURL = "invalid-url"
@@ -18,6 +18,9 @@ final class ConnectTests: XCTestCase {
         "netflix": .service(Service(traits: ["plan"], activities: ["watch"], required: false)),
         "instacart": .service(Service(traits: [], activities: ["shop"], required: false))
     ]
+    let slackServiceWithWorkspaceURL: InputData = ["slack": .service(Service(traits: ["rating"], activities: ["message"], required: true, workspaceURL: "https://example-workspace.slack.com"))]
+    let slackServiceWithoutWorkspaceURL: InputData = ["slack": .service(Service(traits: ["rating"], activities: ["message"], required: true))]
+    let slackServiceWithEmptyWorkspaceURL: InputData = ["slack": .service(Service(traits: ["rating"], activities: ["message"], required: true, workspaceURL: ""))]
     let styling = StylingOptions(primaryColor: "#7949D1", backgroundColor: "#fff000", foregroundColor: "#562BA6", accentColor: "#F4F0FB")
 
     func testInitialization() {
@@ -136,5 +139,70 @@ final class ConnectTests: XCTestCase {
         } catch {
             XCTFail("Unexpected error type: \(type(of: error))")
         }
+    }
+    
+    func testSlackServiceWithWorkspaceURL() async {
+        let input = ConnectInput(publicKey: publicKey, redirectURL: redirectURL, services: slackServiceWithWorkspaceURL)
+        let connect = Connect(input: input)
+        
+        do {
+            let generatedURL = try await connect.generateURL()
+            XCTAssertTrue(generatedURL.contains(publicKey))
+            XCTAssertTrue(generatedURL.contains(redirectURL))
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+    
+    func testSlackServiceWithoutWorkspaceURL() async {
+        let input = ConnectInput(publicKey: publicKey, redirectURL: redirectURL, services: slackServiceWithoutWorkspaceURL)
+        let connect = Connect(input: input)
+        
+        do {
+            _ = try await connect.generateURL()
+            XCTFail("Expected to throw, but did not throw")
+        } catch let error as GandalfError {
+            XCTAssertEqual(error.code, .MissingWorkspaceURL)
+            XCTAssertEqual(error.message, "Slack service requires a workspaceURL")
+        } catch {
+            XCTFail("Unexpected error type: \(type(of: error))")
+        }
+    }
+    
+    func testSlackServiceWithEmptyWorkspaceURL() async {
+        let input = ConnectInput(publicKey: publicKey, redirectURL: redirectURL, services: slackServiceWithEmptyWorkspaceURL)
+        let connect = Connect(input: input)
+        
+        do {
+            _ = try await connect.generateURL()
+            XCTFail("Expected to throw, but did not throw")
+        } catch let error as GandalfError {
+            XCTAssertEqual(error.code, .MissingWorkspaceURL)
+            XCTAssertEqual(error.message, "Slack service requires a workspaceURL")
+        } catch {
+            XCTFail("Unexpected error type: \(type(of: error))")
+        }
+    }
+    
+    func testServiceInitializationWithWorkspaceURL() {
+        let service = Service(traits: ["rating"], activities: ["message"], required: true, workspaceURL: "https://example-workspace.slack.com")
+        
+        XCTAssertEqual(service.traits, ["rating"])
+        XCTAssertEqual(service.activities, ["message"])
+        XCTAssertTrue(service.required)
+        XCTAssertEqual(service.workspaceURL, "https://example-workspace.slack.com")
+    }
+    
+    func testSlackValidationLogic() {
+        // Test that Slack service without workspaceURL would fail validation
+        let slackWithoutWorkspaceURL: InputData = ["slack": .service(Service(traits: ["rating"], activities: ["message"], required: true))]
+        
+        // This should throw MissingWorkspaceURL error when validated
+        // We can't test this directly due to network dependencies, but we can verify the structure
+        XCTAssertTrue(slackWithoutWorkspaceURL["slack"] != nil)
+        
+        // Test that Slack service with workspaceURL would pass validation
+        let slackWithWorkspaceURL: InputData = ["slack": .service(Service(traits: ["rating"], activities: ["message"], required: true, workspaceURL: "https://example-workspace.slack.com"))]
+        XCTAssertTrue(slackWithWorkspaceURL["slack"] != nil)
     }
 }

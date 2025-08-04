@@ -5,6 +5,7 @@ public enum GandalfErrorCode: String {
     case InvalidPublicKey
     case InvalidService
     case InvalidRedirectURL
+    case MissingWorkspaceURL
 }
 
 public struct GandalfError: Error {
@@ -38,11 +39,13 @@ public struct Service {
     public var traits: [String]?
     public var activities: [String]?
     public var required: Bool
+    public var workspaceURL: String?
     
-    public init(traits: [String]? = nil, activities: [String]? = nil, required: Bool = true) {
+    public init(traits: [String]? = nil, activities: [String]? = nil, required: Bool = true, workspaceURL: String? = nil) {
         self.traits = traits
         self.activities = activities
         self.required = required
+        self.workspaceURL = workspaceURL
     }
 }
 
@@ -106,11 +109,24 @@ public class Connect {
             case .boolean(let boolValue):
                 dictionary[key] = boolValue
             case .service(let serviceValue):
-                dictionary[key] = [
+                var serviceDict: [String: Any] = [
                     "traits": serviceValue.traits ?? [],
                     "activities": serviceValue.activities ?? [],
                     "required": serviceValue.required
                 ]
+                
+                // Add workspaceURL if present, stripping http:// or https:// if they exist
+                if let workspaceURL = serviceValue.workspaceURL {
+                    var cleanWorkspaceURL = workspaceURL
+                    if cleanWorkspaceURL.hasPrefix("https://") {
+                        cleanWorkspaceURL = String(cleanWorkspaceURL.dropFirst(8))
+                    } else if cleanWorkspaceURL.hasPrefix("http://") {
+                        cleanWorkspaceURL = String(cleanWorkspaceURL.dropFirst(7))
+                    }
+                    serviceDict["workspaceURL"] = cleanWorkspaceURL
+                }
+                
+                dictionary[key] = serviceDict
             }
         }
         return dictionary
@@ -245,6 +261,17 @@ public class Connect {
                     
                 case .service(let serviceData):
                     try validateInputService(input: serviceData, supportedServicesAndTraits: supportedServicesAndTraits)
+                    
+                    // Validate Slack service requires workspaceURL
+                    if key.lowercased() == "slack" {
+                        if serviceData.workspaceURL?.isEmpty != false  {
+                            throw GandalfError(
+                                message: "Slack service requires a workspaceURL",
+                                code: .MissingWorkspaceURL
+                            )
+                        }
+                    }
+                    
                     cleanServices[key] = service
                 }
             }

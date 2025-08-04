@@ -2,6 +2,11 @@ name: Release
 
 on:
   workflow_dispatch:
+    inputs:
+      target_version:
+        description: 'Target version (e.g., 1.2.0). Leave empty for auto-increment.'
+        required: false
+        type: string
 
 jobs:
   tag_and_release:
@@ -14,24 +19,30 @@ jobs:
     - name: Get current version
       id: get_version
       run: |
-        # Get the latest tag and extract the version
-        latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
-        echo "Latest tag: $latest_tag"
-        if [ -z "$latest_tag" ]; then
-          latest_tag="1.0.0"
-        fi
-        echo "latest_tag=$latest_tag" >> $GITHUB_ENV
+        # Check if target version is provided
+        if [ -n "${{ github.event.inputs.target_version }}" ]; then
+          new_version="${{ github.event.inputs.target_version }}"
+          echo "Using target version: $new_version"
+        else
+          # Get the latest tag and extract the version
+          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo "Latest tag: $latest_tag"
+          if [ -z "$latest_tag" ]; then
+            latest_tag="1.0.0"
+          fi
+          echo "latest_tag=$latest_tag" >> $GITHUB_ENV
 
-        # Split version into components
-        IFS='.' read -r -a version_parts <<< "$latest_tag"
-        major_version=${version_parts[0]}
-        minor_version=${version_parts[1]}
-        patch_version=${version_parts[2]}
-        
-        # Increment the patch version
-        new_patch_version=$((patch_version + 1))
-        new_version="$major_version.$minor_version.$new_patch_version"
-        echo "New version: $new_version"
+          # Split version into components
+          IFS='.' read -r -a version_parts <<< "$latest_tag"
+          major_version=${version_parts[0]}
+          minor_version=${version_parts[1]}
+          patch_version=${version_parts[2]}
+          
+          # Increment the patch version
+          new_patch_version=$((patch_version + 1))
+          new_version="$major_version.$minor_version.$new_patch_version"
+          echo "Auto-incremented version: $new_version"
+        fi
         echo "new_version=$new_version" >> $GITHUB_ENV
 
     - name: Bump version and push tag

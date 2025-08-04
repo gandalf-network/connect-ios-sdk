@@ -9,9 +9,11 @@ struct Example {
 }
 
 func testConnect() async {
+    // Example with valid Slack service
     let services: InputData = [
         "uber": .service(Service(traits: ["rating"], activities: ["trip"],  required: false)),
         "netflix": .service(Service(activities: ["watch"])),
+        "slack": .service(Service(traits: ["rating"], activities: ["message"], required: true, workspaceURL: "https://example-workspace.slack.com")),
     ]
     let style = StylingOptions(primaryColor: "#7949D1", backgroundColor: "#fff000", foregroundColor: "#562BA6", accentColor: "#F4F0FB")
     let connectOptions = ConnectOptions(style: style)
